@@ -17,6 +17,10 @@ public class Stage implements Serializable {
     /** stage file. */
     private HashMap<String, String> files;
 
+    public Stage() {
+        files = new HashMap<>();
+    }
+
     /** Add a file to staging area. */
     public void add(String fileName) {
         File file = Utils.join(Repository.CWD, fileName);
