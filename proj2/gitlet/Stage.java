@@ -33,7 +33,6 @@ public class Stage implements Serializable {
         Blob blob = new Blob(fileName);
         Commit headCommit = Repository.getHead().getCommit();
 
-
         /* file in current commit. */
         if(blob.getHash().equals(headCommit.getFileHash(fileName))) {
             return;

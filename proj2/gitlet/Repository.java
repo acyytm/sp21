@@ -82,7 +82,14 @@ public class Repository {
             System.exit(0);
         }
 
-        stage.add(fileName);
+        Commit commit = head.getCommit();
+        if(commit.isRemoved(fileName)) {
+            commit.reAdd(fileName);
+            commit.saveCommit();
+        }
+        else {
+            stage.add(fileName);
+        }
 
         save();
     }
@@ -171,7 +178,7 @@ public class Repository {
                 file.delete();
             }
         }
-        
+
         if(!exist) {
             System.out.println("No reason to remove the file.");
             save();

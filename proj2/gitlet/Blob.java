@@ -60,7 +60,9 @@ public class Blob implements Serializable {
         Utils.writeObject(blob, this);
     }
 
-    /** blob is the abstraction of file, this method write content to file. */
+    /** blob is the abstraction of file, this method write content to file.
+     * @param dir
+     * */
     public void writeToFile(File dir) {
         File file = Utils.join(dir, fileName);
         Utils.writeContents(file, fileContent);

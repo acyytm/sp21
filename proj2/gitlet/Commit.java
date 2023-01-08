@@ -207,5 +207,19 @@ public class Commit implements Serializable{
         }
         System.out.println();
     }
+
+    /** Return whether the file exists in removedFiles. */
+    public boolean isRemoved(String fileName) {
+        return removedFiles.containsKey(fileName);
+    }
+
+    /** Readd a removed file. */
+    public void reAdd(String fileName) {
+        Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, removedFiles.get(fileName));
+        blob.writeToFile(Repository.CWD);
+
+        map.put(fileName, removedFiles.get(fileName));
+        removedFiles.remove(fileName);
+    }
     /* TODO: fill in the rest of this class. */
 }
