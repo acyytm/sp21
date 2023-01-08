@@ -166,16 +166,16 @@ public class Repository {
             exist = true;
             commit.remove(fileName);
             commit.saveCommit();
-        }
 
+            if(file.exists()) {
+                file.delete();
+            }
+        }
+        
         if(!exist) {
             System.out.println("No reason to remove the file.");
             save();
             System.exit(0);
-        }
-
-        if(file.exists()) {
-            file.delete();
         }
 
         save();

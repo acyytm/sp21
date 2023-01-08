@@ -65,11 +65,11 @@ public class Main {
     }
 
     public static void validateMessage(String[] args) {
-        if(args.length == 1) {
+        validateNumArgs("commit", args, 2);
+        if(args[1].isEmpty()) {
             System.out.println("Please enter a commit message.");
             System.exit(0);
         }
-        validateNumArgs("commit", args, 2);
     }
 
     public static void checkout(String[] args){
