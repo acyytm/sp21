@@ -136,9 +136,9 @@ public class Commit implements Serializable{
     private String getCommitHash() {
         String content = "commit\n";
         if(parent == null)
-            content += message + timestamp + map + "null";
+            content += message + timestamp + map + removedFiles + "null";
         else
-            content += message + timestamp + map + parent;
+            content += message + timestamp + map + removedFiles + parent;
         String hash = Utils.sha1(content);
         return hash;
     }
@@ -220,6 +220,11 @@ public class Commit implements Serializable{
 
         map.put(fileName, removedFiles.get(fileName));
         removedFiles.remove(fileName);
+    }
+
+    /** Return if removedFiles is empty. */
+    public boolean hasNoRemoved() {
+        return removedFiles.isEmpty();
     }
     /* TODO: fill in the rest of this class. */
 }

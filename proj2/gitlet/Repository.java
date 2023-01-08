@@ -98,7 +98,8 @@ public class Repository {
     public static void commit(String message) {
         read();
 
-        if(stage.empty()) {
+        Commit headCommit = head.getCommit();
+        if(stage.empty() && headCommit.hasNoRemoved()) {
             System.out.println("No changes added to the commit.");
             save();
             System.exit(0);
