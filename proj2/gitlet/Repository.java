@@ -50,7 +50,6 @@ public class Repository {
     public static void init() {
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
-            save();
             System.exit(0);
         }
 
