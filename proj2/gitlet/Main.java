@@ -1,10 +1,13 @@
 package gitlet;
 
+import java.net.ResponseCache;
+import java.util.ResourceBundle;
+
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
  */
 public class Main {
-    // TODO: command: checkout id -- file
+    // TODO: command: branch, rm
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
@@ -33,6 +36,18 @@ public class Main {
                 validateNumArgs("log", args, 1);
                 Repository.log();
                 break;
+            case "branch":
+                validateNumArgs("branch", args, 2);
+                Repository.branch(args[1]);
+                break;
+            case "rm":
+                validateNumArgs("rm", args, 2);
+                Repository.rm(args[1]);
+                break;
+            case "status":
+                validateNumArgs("status", args, 1);
+                Repository.status();
+                break;
             case "":
                 System.out.println("Please enter a command.");
                 break;
@@ -59,7 +74,7 @@ public class Main {
 
     public static void checkout(String[] args){
         //checkout id
-        if(args.length == 2) {
+        if(args.length == 2) { // delete all file that current commit tracked and rewrite all file that new branch tracked
         }
         // checkout -- [file name]
         if(args.length == 3) {

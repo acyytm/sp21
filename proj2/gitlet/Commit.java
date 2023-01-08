@@ -48,6 +48,9 @@ public class Commit implements Serializable{
     /** Hash code of the commit. */
     private String hash;
 
+    /** keep removed files. */
+    private HashMap<String, String> removedFiles;
+
     /**
      * A constructor that takes message and its parent as arguments, timestamp will be initialized automatically.
      * @param message commit message -m message
@@ -62,8 +65,8 @@ public class Commit implements Serializable{
         map.putAll(parentCommit.map);
         fromStage();
         hash = getCommitHash();
-        Head head = Repository.getHead();
-        head.pointTo(this);
+        // Head head = Repository.getHead();
+        //head.pointTo(this);
 
         generateLog();
     }
@@ -87,8 +90,12 @@ public class Commit implements Serializable{
         this.timestamp = timestamp;
         parents = new ArrayList<>();
         this.map = new HashMap<>();
+        this.removedFiles = new HashMap<>();
     }
 
+    /**
+     * Help method, generate this commit's log.
+     */
     private void generateLog() {
         Locale usLocale = new Locale("en", "US");
         SimpleDateFormat DateFor = new SimpleDateFormat("E MMM d HH:mm:ss yyyy Z", usLocale);
@@ -107,12 +114,25 @@ public class Commit implements Serializable{
         Utils.writeObject(commitFile, this);
     }
 
+    /**
+     * Read commit object from specific name(hash).
+     * @param sha1
+     * @return
+     */
     public static Commit fromFile(String sha1) {
         File commitFile = Utils.join(COMMIT_DIR, sha1);
+        if(!commitFile.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
         Commit commit = Utils.readObject(commitFile, Commit.class);
         return commit;
     }
 
+    /**
+     * Help method, get this commit's hash code
+     * @return
+     */
     private String getCommitHash() {
         String content = "commit\n";
         if(parent == null)
@@ -123,14 +143,22 @@ public class Commit implements Serializable{
         return hash;
     }
 
+    /** Return commit's hash code. */
     public String getHash() {
         return hash;
     }
 
+    /**
+     * fileName can map to a Blob object, using hash code
+     * actual return blob hash.
+     * */
     public String getFileHash(String fileName) {
         return map.get(fileName);
     }
 
+    /**
+     * help method, read Staging blob and add them to current commit.
+     */
     private void fromStage() {
         Stage stage = Repository.getStage();
         HashMap<String, String> stageMap = stage.getFiles();
@@ -143,12 +171,41 @@ public class Commit implements Serializable{
         stage.deleteFiles();
     }
 
+    /**
+     * @return log information of a chain of commit.
+     */
     public String getLog() {
         if(parent != null) {
             Commit parentCommit = Commit.fromFile(parent);
             return log + parentCommit.getLog();
         }
         return log;
+    }
+
+    /** Return if this file was contained. */
+    public boolean contain(String fileName) {
+        return map.containsKey(fileName);
+    }
+
+    /** Remove that file from map, and put it into removeFiles. */
+    public void remove(String fileName) {
+        removedFiles.put(fileName, map.get(fileName));
+        map.remove(fileName);
+    }
+
+    /** Display removed files. */
+    public void displayRemovedFiles() {
+        Set<String> set = removedFiles.keySet();
+        Object[] arr = set.toArray();
+        Arrays.sort(arr);
+
+        System.out.println("=== Removed Files ===");
+
+        for(Object key: arr)
+        {
+            System.out.println(key);
+        }
+        System.out.println();
     }
     /* TODO: fill in the rest of this class. */
 }

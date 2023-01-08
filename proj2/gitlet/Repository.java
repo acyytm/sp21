@@ -1,6 +1,12 @@
 package gitlet;
 
+import jdk.jshell.execution.Util;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+
 import static gitlet.Utils.*;
 
 // TODO: any imports you need here
@@ -35,12 +41,17 @@ public class Repository {
     /**Stage instance. */
     private static Stage stage;
 
+    /** branches. */
+    private static Branches branches;
+
     /* TODO: fill in the rest of this class. */
 
     /** Init a repo. */
     public static void init() {
         if (GITLET_DIR.exists()) {
-            throw new GitletException("A Gitlet version-control system already exists in the current directory.");
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            save();
+            System.exit(0);
         }
 
         /* create necessary to keep track on repo. */
@@ -51,6 +62,9 @@ public class Repository {
 
         head = new Head(commit);
         stage = new Stage();
+        branches = new Branches();
+        branches.addBranch("master");
+
         save();
     }
 
@@ -65,10 +79,12 @@ public class Repository {
          and then changed back to it’s original version).*/
         if(!GITLET_DIR.exists()) {
             System.out.println("Not in an initialized Gitlet directory.");
+            save();
             System.exit(0);
         }
 
         stage.add(fileName);
+
         save();
     }
 
@@ -78,11 +94,16 @@ public class Repository {
 
         if(stage.empty()) {
             System.out.println("No changes added to the commit.");
+            save();
             System.exit(0);
         }
 
         Commit commit = new Commit(message, head.getCommit().getHash());
         commit.saveCommit();
+
+        head.pointTo(commit);
+        String branch = head.getCurrentBranch();
+        branches.update(branch, commit);
 
         save();
     }
@@ -94,12 +115,14 @@ public class Repository {
         save();
     }
 
+    /** checkout id -- file command. */
     public static void checkout(String fileName, String hash) {
         read();
         Commit commit = Commit.fromFile(hash);
         String fileHash = commit.getFileHash(fileName);
         if(fileHash == null) {
             System.out.println("File does not exist in that commit.");
+            save();
             System.exit(0);
         }
         Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, fileHash);
@@ -116,6 +139,62 @@ public class Repository {
         save();
     }
 
+    /** Branch command. */
+    public static void branch(String branchName) {
+        read();
+
+        branches.addBranch(branchName);
+
+        save();
+    }
+
+    /** Rm command. */
+    public static void rm(String fileName) {
+        read();
+
+        File file = Utils.join(CWD, fileName);
+
+        boolean exist = false;
+
+        if(stage.contain(fileName)) {
+            exist = true;
+            stage.removeFromStage(fileName);
+        }
+
+        Commit commit = head.getCommit();
+
+        if(commit.contain(fileName)) {
+            exist = true;
+            commit.remove(fileName);
+            commit.saveCommit();
+        }
+
+        if(!exist) {
+            System.out.println("No reason to remove the file.");
+            save();
+            System.exit(0);
+        }
+
+        if(file.exists()) {
+            file.delete();
+        }
+
+        save();
+    }
+
+    public static void status() {
+        read();
+
+        branches.display();
+        stage.display();
+        head.getCommit().displayRemovedFiles();
+
+        System.out.println("=== Modifications Not Staged For Commit ===\n");
+        System.out.println("=== Untracked Files ===\n");
+
+        save();
+    }
+
     /** Set up persistence to save file and create necessary directory. */
     public static void setupPersistence() {
         GITLET_DIR.mkdir();
@@ -129,6 +208,7 @@ public class Repository {
     public static void read() {
         stage = Stage.fromFile();
         head = Head.fromFile();
+        branches = Branches.fromFile();
     }
 
     /** Get head pointer, you should invoke this after read.*/
@@ -146,5 +226,6 @@ public class Repository {
     public static void save() {
         stage.saveStage();
         head.saveHead();
+        branches.saveBranches();
     }
 }

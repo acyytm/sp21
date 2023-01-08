@@ -2,8 +2,10 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Staging Area for gitlet
@@ -66,6 +68,8 @@ public class Stage implements Serializable {
 
     /** Return if stage is now empty. */
     public boolean empty() {
+        if(files == null)
+            return true;
         return files.isEmpty();
     }
 
@@ -74,6 +78,7 @@ public class Stage implements Serializable {
         return files;
     }
 
+    /** Delete all stage files. */
     public void deleteFiles() {
         for(Map.Entry<String, String> entry: files.entrySet())
         {
@@ -81,5 +86,30 @@ public class Stage implements Serializable {
             file.delete();
         }
         files.clear();
+    }
+
+    /** Return if contains specific file, using fileName. */
+    public boolean contain(String fileName) {
+        return files.containsKey(fileName);
+    }
+
+    /** Delete specific file, using fileName. */
+    public void removeFromStage(String fileName) {
+        files.remove(fileName);
+    }
+
+    /** Display staged files. */
+    public void display() {
+        Set<String> set = files.keySet();
+        Object[] arr = set.toArray();
+        Arrays.sort(arr);
+
+        System.out.println("=== Staged Files ===");
+
+        for(Object key: arr)
+        {
+            System.out.println(key);
+        }
+        System.out.println();
     }
 }

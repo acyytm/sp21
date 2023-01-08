@@ -9,9 +9,11 @@ import java.io.Serializable;
 public class Head implements Serializable {
     /** point to current working status, which is a hash code (sha1) */
     private String current;
+    private String branch;
 
     public Head(Commit commit) {
         current = commit.getHash();
+        branch = "master";
     }
     public void pointTo(Commit commit) {
         current = commit.getHash();
@@ -31,6 +33,16 @@ public class Head implements Serializable {
         File file = Utils.join(Repository.GITLET_DIR, "Head");
         Head head = Utils.readObject(file, Head.class);
         return head;
+    }
+
+    /** checkout a branch, head should point to that branch. */
+    public void check(String branchName) {
+        branch = branchName;
+    }
+
+    /** Return current branch name. */
+    public String getCurrentBranch() {
+        return branch;
     }
 
 }
