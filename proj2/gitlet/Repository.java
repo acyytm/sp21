@@ -302,11 +302,13 @@ public class Repository {
             System.exit(0);
         }
 
+        String oldBranch = head.getCurrentBranch();
         Commit oldCommit = head.getCommit();
         head.pointTo(Commit.fromFile(hash));
         branches.addBranch("temp");
         head.pointTo(oldCommit);
         checkoutBranch("temp");
+        head.pointToBranch(oldBranch);
         branches.removeBranch("temp");
         stage.deleteFiles();
 
