@@ -311,7 +311,9 @@ public class Repository {
         head.pointToBranch(oldBranch);
         branches.removeBranch("temp");
         stage.deleteFiles();
-
+        //=========
+        head.getCommit().clearRemoved();
+        //=========
         save();
     }
 

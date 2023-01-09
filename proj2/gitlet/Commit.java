@@ -252,5 +252,12 @@ public class Commit implements Serializable{
     public HashMap<String, String> getRemovedFiles() {
         return removedFiles;
     }
+
+    /**
+     * test method
+     */
+    public void clearRemoved() {
+        removedFiles.clear();
+    }
     /* TODO: fill in the rest of this class. */
 }
