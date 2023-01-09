@@ -384,28 +384,25 @@ public class Repository {
      * @return true while everything has been committed, false while not
      */
     private static boolean checkCWD(Commit target) {
-        Commit currentCommit = head.getCommit();
+        //Commit currentCommit = head.getCommit();
 
         List<String> filesCWD = Utils.plainFilenamesIn(CWD);
-        HashMap<String, String> filesCommitted = target.getMap();
-        HashMap<String, String> filesStaged = stage.getFiles();
+        HashMap<String, String> filesTargetCommitted = target.getMap();
+        HashMap<String, String> currentCommitFiles = head.getCommit().getMap();
 
         for(String file: filesCWD)
         {
             Blob blob = new Blob(file);
-            if(filesCommitted.containsKey(file)) {
-                 if (filesCommitted.get(file).equals(blob.getHash())) {
+            if(filesTargetCommitted.containsKey(file)) {
+                 if (filesTargetCommitted.get(file).equals(blob.getHash())) {
                      continue;
                  }
-            }else{
-                continue;
+                 if(!currentCommitFiles.containsKey(file)){
+                     return false;
+                 }else if(!currentCommitFiles.get(file).equals(blob.getHash())){
+                     return false;
+                 }
             }
-            if(filesStaged.containsKey(file)) {
-                if (filesStaged.get(file).equals(blob.getHash())) {
-                    continue;
-                }
-            }
-            return false;
         }
         return true;
     }
