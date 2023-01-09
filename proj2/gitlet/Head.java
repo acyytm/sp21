@@ -9,6 +9,8 @@ import java.io.Serializable;
 public class Head implements Serializable {
     /** point to current working status, which is a hash code (sha1) */
     private String current;
+
+    /** current branch name.*/
     private String branch;
 
     public Head(Commit commit) {
@@ -17,6 +19,10 @@ public class Head implements Serializable {
     }
     public void pointTo(Commit commit) {
         current = commit.getHash();
+    }
+
+    public void pointToBranch(String branchName) {
+        branch = branchName;
     }
 
     public Commit getCommit() {

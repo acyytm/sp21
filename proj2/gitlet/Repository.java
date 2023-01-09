@@ -171,6 +171,7 @@ public class Repository {
         /* write all files tracks by branch to CWD. */
         Commit commit = branches.getCommit(branchName);
         head.pointTo(commit);
+        head.pointToBranch(branchName);
         filesMap = commit.getMap();
         for(Map.Entry<String, String> entry: filesMap.entrySet())
         {
