@@ -313,6 +313,7 @@ public class Repository {
         stage.deleteFiles();
         //=========
         head.getCommit().clearRemoved();
+        head.getCommit().saveCommit();
         //=========
         save();
     }
