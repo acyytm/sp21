@@ -306,12 +306,8 @@ public class Repository {
         head.pointTo(Commit.fromFile(hash));
         branches.addBranch("temp");
         head.pointTo(oldCommit);
-        save();
         checkoutBranch("temp");
-        read();
         branches.removeBranch("temp");
-        branches.removeBranch(head.getCurrentBranch());
-        branches.addBranch(head.getCurrentBranch());
 
         save();
     }
@@ -344,9 +340,12 @@ public class Repository {
 
     /** Read necessary instance from file. */
     public static void read() {
-        stage = Stage.fromFile();
-        head = Head.fromFile();
-        branches = Branches.fromFile();
+        if(stage == null)
+            stage = Stage.fromFile();
+        if(head == null)
+            head = Head.fromFile();
+        if(branches == null)
+            branches = Branches.fromFile();
     }
 
     /** Get head pointer, you should invoke this after read.*/
