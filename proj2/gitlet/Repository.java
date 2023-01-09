@@ -151,8 +151,10 @@ public class Repository {
             System.exit(0);
         }
 
+        Commit commit = branches.getCommit(branchName);
+
         /* cwd is not working tree clean. */
-        if(!checkCWD()) {
+        if(!checkCWD(commit)) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             save();
             System.exit(0);
@@ -170,7 +172,6 @@ public class Repository {
         }
 
         /* write all files tracks by branch to CWD. */
-        Commit commit = branches.getCommit(branchName);
         head.pointTo(commit);
         head.pointToBranch(branchName);
         filesMap = commit.getMap();
@@ -296,7 +297,9 @@ public class Repository {
     public static void reset(String hash) {
         read();
 
-        if(!checkCWD()) {
+        Commit target = Commit.fromFile(hash);
+
+        if(!checkCWD(target)) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             save();
             System.exit(0);
@@ -304,7 +307,8 @@ public class Repository {
 
         String oldBranch = head.getCurrentBranch();
         Commit oldCommit = head.getCommit();
-        head.pointTo(Commit.fromFile(hash));
+
+        head.pointTo(target);
         branches.addBranch("temp");
         head.pointTo(oldCommit);
         checkoutBranch("temp");
@@ -317,6 +321,7 @@ public class Repository {
         headCommit.saveCommit();
         head.pointTo(headCommit);
         //=========
+
         save();
     }
 
@@ -378,11 +383,11 @@ public class Repository {
      * check if current working dir has everything committed
      * @return true while everything has been committed, false while not
      */
-    private static boolean checkCWD() {
+    private static boolean checkCWD(Commit target) {
         Commit currentCommit = head.getCommit();
 
         List<String> filesCWD = Utils.plainFilenamesIn(CWD);
-        HashMap<String, String> filesCommitted = head.getCommit().getMap();
+        HashMap<String, String> filesCommitted = target.getMap();
         HashMap<String, String> filesStaged = stage.getFiles();
 
         for(String file: filesCWD)
@@ -392,6 +397,8 @@ public class Repository {
                  if (filesCommitted.get(file).equals(blob.getHash())) {
                      continue;
                  }
+            }else{
+                continue;
             }
             if(filesStaged.containsKey(file)) {
                 if (filesStaged.get(file).equals(blob.getHash())) {
