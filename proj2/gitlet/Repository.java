@@ -391,14 +391,18 @@ public class Repository {
             if(filesCommitted.containsKey(file)) {
                  if (filesCommitted.get(file).equals(blob.getHash())) {
                      continue;
+                 }else{
+                     return false;
                  }
             }
             if(filesStaged.containsKey(file)) {
                 if (filesStaged.get(file).equals(blob.getHash())) {
                     continue;
+                }else{
+                    return false;
                 }
             }
-            return false;
+            //return false;
         }
         return true;
     }
