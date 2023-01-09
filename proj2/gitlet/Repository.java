@@ -349,7 +349,7 @@ public class Repository {
         for(String file: filesCWD)
         {
             if(filesCommitted.containsKey(file)) {
-                Blob blob = Blob.fromFile(CWD, file);
+                Blob blob = new Blob(file);
                  if (filesCommitted.get(file).equals(blob.getHash())) {
                      continue;
                  }
