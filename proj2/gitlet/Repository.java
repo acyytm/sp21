@@ -375,15 +375,20 @@ public class Repository {
 
         List<String> filesCWD = Utils.plainFilenamesIn(CWD);
         HashMap<String, String> filesCommitted = head.getCommit().getMap();
-
+        HashMap<String, String> filesRemoved = head.getCommit().getRemovedFiles();
 
         for(String file: filesCWD)
         {
+            Blob blob = new Blob(file);
             if(filesCommitted.containsKey(file)) {
-                Blob blob = new Blob(file);
                  if (filesCommitted.get(file).equals(blob.getHash())) {
                      continue;
                  }
+            }
+            if(filesRemoved.containsKey(file)) {
+                if (filesRemoved.get(file).equals(blob.getHash())) {
+                    continue;
+                }
             }
             return false;
         }

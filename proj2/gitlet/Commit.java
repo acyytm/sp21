@@ -245,5 +245,12 @@ public class Commit implements Serializable{
     public HashMap<String, String> getMap() {
         return map;
     }
+
+    /**
+     * Return removal file map
+     */
+    public HashMap<String, String> getRemovedFiles() {
+        return removedFiles;
+    }
     /* TODO: fill in the rest of this class. */
 }
