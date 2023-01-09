@@ -320,6 +320,8 @@ public class Repository {
         headCommit.clearRemoved();
         headCommit.saveCommit();
         head.pointTo(headCommit);
+        branches.removeBranch(oldBranch);
+        branches.addBranch(oldBranch);
         //=========
 
         save();
