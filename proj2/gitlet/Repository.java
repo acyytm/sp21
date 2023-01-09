@@ -3,10 +3,7 @@ package gitlet;
 import jdk.jshell.execution.Util;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -137,6 +134,53 @@ public class Repository {
         blob.writeToFile(CWD);
         save();
     }
+
+    /** checkout branch name command.*/
+    public static void checkoutBranch(String branchName) {
+        read();
+
+        /* branch with branchName doesn't exist. */
+        if(branches.getBranch(branchName) == null) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
+
+        /* branch with branchName is current head branch. */
+        if(head.getCurrentBranch().equals(branchName)) {
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        }
+
+        /* stage is not empty. */
+        if(!stage.empty()) {
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
+        }
+
+        /* clear all files head commit tracks on. */
+        Commit headCommit = head.getCommit();
+        HashMap<String, String> filesMap = headCommit.getMap();
+        for(Map.Entry<String, String> entry: filesMap.entrySet())
+        {
+            File file = Utils.join(CWD, entry.getKey());
+            if(file.exists()) {
+                file.delete();
+            }
+        }
+
+        /* write all files tracks by branch to CWD. */
+        Commit commit = branches.getCommit(branchName);
+        head.pointTo(commit);
+        filesMap = commit.getMap();
+        for(Map.Entry<String, String> entry: filesMap.entrySet())
+        {
+            Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, entry.getValue());
+            blob.writeToFile(CWD);
+        }
+
+        save();
+    }
+
 
     /** Log command. */
     public static void log() {

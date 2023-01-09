@@ -83,6 +83,7 @@ public class Main {
     public static void checkout(String[] args){
         //checkout id
         if(args.length == 2) { // delete all file that current commit tracked and rewrite all file that new branch tracked
+            Repository.checkoutBranch(args[1]);
         }
         // checkout -- [file name]
         if(args.length == 3) {

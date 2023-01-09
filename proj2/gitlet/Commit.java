@@ -238,5 +238,12 @@ public class Commit implements Serializable{
     public String getMessage() {
         return message;
     }
+
+    /**
+     * Return all blob tracks on
+     */
+    public HashMap<String, String> getMap() {
+        return map;
+    }
     /* TODO: fill in the rest of this class. */
 }

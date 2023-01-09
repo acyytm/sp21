@@ -23,7 +23,9 @@ public class Branches implements Serializable {
     }
 
     // seems useless
-    /** Return commit instance that branch point to. */
+    /** Return commit instance that branch point to
+     * @param name: branch name
+     */
     public Commit getCommit(String name) {
         String hash = map.get(name);
         if(hash == null) {
@@ -47,6 +49,13 @@ public class Branches implements Serializable {
         Head head = Repository.getHead();
         Commit headCommit = head.getCommit();
         map.put(branchName, headCommit.getHash());
+    }
+
+    /**
+     * Return branch with branchName, null if it doesn't exist
+     */
+    public String getBranch(String branchName) {
+        return map.get(branchName);
     }
 
     /**
