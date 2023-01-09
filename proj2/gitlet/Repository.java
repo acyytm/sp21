@@ -151,9 +151,10 @@ public class Repository {
             System.exit(0);
         }
 
-        /* stage is not empty. */
-        if(!stage.empty()) {
+        /* cwd is not working tree clean. */
+        if(!checkCWD()) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            save();
             System.exit(0);
         }
 
@@ -289,6 +290,17 @@ public class Repository {
         save();
     }
 
+    /** Reset command.
+     * @param hash commit id
+     * */
+    public static void reset(String hash) {
+        read();
+
+        Commit commit = Commit.fromFile(hash);
+
+        save();
+    }
+
     /** Set up persistence to save file and create necessary directory. */
     public static void setupPersistence() {
         GITLET_DIR.mkdir();
@@ -321,5 +333,29 @@ public class Repository {
         stage.saveStage();
         head.saveHead();
         branches.saveBranches();
+    }
+
+    /**
+     * check if current working dir has everything committed
+     * @return true while everything has been committed, false while not
+     */
+    private static boolean checkCWD() {
+        Commit currentCommit = head.getCommit();
+
+        List<String> filesCWD = Utils.plainFilenamesIn(CWD);
+        HashMap<String, String> filesCommitted = head.getCommit().getMap();
+
+
+        for(String file: filesCWD)
+        {
+            if(filesCommitted.containsKey(file)) {
+                Blob blob = Blob.fromFile(CWD, file);
+                 if (filesCommitted.get(file).equals(blob.getHash())) {
+                     continue;
+                 }
+            }
+            return false;
+        }
+        return true;
     }
 }

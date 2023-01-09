@@ -56,6 +56,10 @@ public class Main {
                 validateNumArgs("find", args, 2);
                 Repository.find(args[1]);
                 break;
+            case "reset":
+                validateNumArgs("reset", args, 2);
+                Repository.reset(args[1]);
+                break;
             case "":
                 System.out.println("Please enter a command.");
                 break;
