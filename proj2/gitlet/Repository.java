@@ -5,6 +5,7 @@ import jdk.jshell.execution.Util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static gitlet.Utils.*;
@@ -141,7 +142,7 @@ public class Repository {
     public static void log() {
         read();
         Commit commit = head.getCommit();
-        String commitLog = commit.getLog();
+        String commitLog = commit.getLogChain();
         System.out.print(commitLog);
         save();
     }
@@ -189,6 +190,7 @@ public class Repository {
         save();
     }
 
+    /** status command. */
     public static void status() {
         read();
 
@@ -198,6 +200,46 @@ public class Repository {
 
         System.out.println("=== Modifications Not Staged For Commit ===\n");
         System.out.println("=== Untracked Files ===\n");
+
+        save();
+    }
+
+    /** global-log command. */
+    public static void globalLog() {
+        read();
+
+        List<String> commits = Utils.plainFilenamesIn(Commit.COMMIT_DIR);
+        for (String commitObj: commits)
+        {
+            Commit commit = Commit.fromFile(commitObj);
+            String log = commit.getLog();
+            System.out.print(log);
+        }
+
+        save();
+    }
+
+    /** Find command. */
+    public static void find(String message) {
+        read();
+
+        List<String> commits = Utils.plainFilenamesIn(Commit.COMMIT_DIR);
+        boolean found = false;
+        for (String commitObj: commits)
+        {
+            Commit commit = Commit.fromFile(commitObj);
+            String commitMessage = commit.getMessage();
+            if(message.equals(commitMessage)) {
+                System.out.println(commitObj);
+                found = true;
+            }
+        }
+
+        if(!found) {
+            System.out.println("Found no commit with that message.");
+            save();
+            System.exit(0);
+        }
 
         save();
     }

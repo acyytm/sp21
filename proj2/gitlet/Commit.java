@@ -174,10 +174,10 @@ public class Commit implements Serializable{
     /**
      * @return log information of a chain of commit.
      */
-    public String getLog() {
+    public String getLogChain() {
         if(parent != null) {
             Commit parentCommit = Commit.fromFile(parent);
-            return log + parentCommit.getLog();
+            return log + parentCommit.getLogChain();
         }
         return log;
     }
@@ -225,6 +225,18 @@ public class Commit implements Serializable{
     /** Return if removedFiles is empty. */
     public boolean hasNoRemoved() {
         return removedFiles.isEmpty();
+    }
+
+    /** Get the commit log. */
+    public String getLog() {
+        return log;
+    }
+
+    /**
+     * Get commit message.
+     */
+    public String getMessage() {
+        return message;
     }
     /* TODO: fill in the rest of this class. */
 }

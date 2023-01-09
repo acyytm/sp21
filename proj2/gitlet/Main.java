@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
  *  @author TODO
  */
 public class Main {
-    // TODO: command: branch, rm
+    // TODO: command: global-log, find, checkout branch
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
@@ -48,6 +48,14 @@ public class Main {
                 validateNumArgs("status", args, 1);
                 Repository.status();
                 break;
+            case "global-log":
+                validateNumArgs("global-log", args, 1);
+                Repository.globalLog();
+                break;
+            case "find":
+                validateNumArgs("find", args, 2);
+                Repository.find(args[1]);
+                break;
             case "":
                 System.out.println("Please enter a command.");
                 break;
@@ -82,6 +90,10 @@ public class Main {
         }
         //checkout id -- [file name]
         if(args.length == 4) {
+            if(!args[2].equals("--")) {
+                System.out.println("Incorrect operands");
+                System.exit(0);
+            }
             Repository.checkout(args[3], args[1]);
         }
     }
