@@ -308,6 +308,7 @@ public class Repository {
         head.pointTo(oldCommit);
         checkoutBranch("temp");
         branches.removeBranch("temp");
+        stage.deleteFiles();
 
         save();
     }
@@ -375,7 +376,7 @@ public class Repository {
 
         List<String> filesCWD = Utils.plainFilenamesIn(CWD);
         HashMap<String, String> filesCommitted = head.getCommit().getMap();
-        HashMap<String, String> filesRemoved = head.getCommit().getRemovedFiles();
+        HashMap<String, String> filesStaged = stage.getFiles();
 
         for(String file: filesCWD)
         {
@@ -385,8 +386,8 @@ public class Repository {
                      continue;
                  }
             }
-            if(filesRemoved.containsKey(file)) {
-                if (filesRemoved.get(file).equals(blob.getHash())) {
+            if(filesStaged.containsKey(file)) {
+                if (filesStaged.get(file).equals(blob.getHash())) {
                     continue;
                 }
             }
