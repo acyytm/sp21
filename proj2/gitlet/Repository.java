@@ -312,8 +312,10 @@ public class Repository {
         branches.removeBranch("temp");
         stage.deleteFiles();
         //=========
-        head.getCommit().clearRemoved();
-        head.getCommit().saveCommit();
+        Commit headCommit = head.getCommit();
+        headCommit.clearRemoved();
+        headCommit.saveCommit();
+        head.pointTo(headCommit);
         //=========
         save();
     }

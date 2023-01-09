@@ -136,9 +136,9 @@ public class Commit implements Serializable{
     private String getCommitHash() {
         String content = "commit\n";
         if(parent == null)
-            content += message + timestamp + map + removedFiles + "null";
+            content += message + timestamp + map + "null";
         else
-            content += message + timestamp + map + removedFiles + parent;
+            content += message + timestamp + map + parent;
         String hash = Utils.sha1(content);
         return hash;
     }
