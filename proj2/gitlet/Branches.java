@@ -99,4 +99,15 @@ public class Branches implements Serializable {
         }
         System.out.println();
     }
+
+    /**
+     * Remove branch with given name.
+     */
+    public void removeBranch(String branchName) {
+        if(!map.containsKey(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        map.remove(branchName);
+    }
 }

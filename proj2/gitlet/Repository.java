@@ -296,7 +296,38 @@ public class Repository {
     public static void reset(String hash) {
         read();
 
-        Commit commit = Commit.fromFile(hash);
+        if(!checkCWD()) {
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            save();
+            System.exit(0);
+        }
+
+        Commit oldCommit = head.getCommit();
+        head.pointTo(Commit.fromFile(hash));
+        branches.addBranch("temp");
+        head.pointTo(oldCommit);
+        checkoutBranch("temp");
+        branches.removeBranch("temp");
+        branches.removeBranch(head.getCurrentBranch());
+        branches.addBranch(head.getCurrentBranch());
+
+
+        save();
+    }
+
+    /**
+     * Remove branch command
+     */
+    public static void removeBranch(String branchName) {
+        read();
+
+        if(head.getCurrentBranch().equals(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+            save();
+            System.exit(0);
+        }
+
+        branches.removeBranch(branchName);
 
         save();
     }
