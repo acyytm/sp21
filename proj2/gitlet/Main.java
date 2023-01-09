@@ -60,6 +60,10 @@ public class Main {
                 validateNumArgs("reset", args, 2);
                 Repository.reset(args[1]);
                 break;
+            case "rm-branch":
+                validateNumArgs("rm-branch", args, 2);
+                Repository.removeBranch(args[1]);
+                break;
             case "":
                 System.out.println("Please enter a command.");
                 break;

@@ -306,11 +306,12 @@ public class Repository {
         head.pointTo(Commit.fromFile(hash));
         branches.addBranch("temp");
         head.pointTo(oldCommit);
+        save();
         checkoutBranch("temp");
+        read();
         branches.removeBranch("temp");
         branches.removeBranch(head.getCurrentBranch());
         branches.addBranch(head.getCurrentBranch());
-
 
         save();
     }
