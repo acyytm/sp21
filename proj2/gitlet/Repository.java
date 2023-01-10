@@ -346,6 +346,11 @@ public class Repository {
         Commit headCommit = head.getCommit();
         Commit split = findSplit(headCommit, otherCommit);
 
+        if(split.getHash().equals(headCommit.getHash())) {
+            checkoutBranch(branchName);
+            return;
+        }
+
         Set<String> fileSet = new HashSet<>();
         fileSet.addAll(otherCommit.getMap().keySet());
         fileSet.addAll(headCommit.getMap().keySet());
@@ -356,8 +361,8 @@ public class Repository {
             switch (property) {
                 case 1:
                 case 6:
-                    otherCommit.getFileHash(fileName);
-                    Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, fileName);
+                    String blobHash = otherCommit.getFileHash(fileName);
+                    Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, blobHash);
                     blob.writeToFile(CWD);
                     stage.add(fileName);
                     break;
@@ -392,6 +397,9 @@ public class Repository {
 
         for(String hash = headCommit.getHash(); hash != null; hash = headCommit.getHash()) {
             set.add(headCommit.getHash());
+            if(headCommit.getParent() == null) {
+                break;
+            }
             headCommit = Commit.fromFile(headCommit.getParent());
         }
 
@@ -401,6 +409,9 @@ public class Repository {
                 break;
             }
             set.add(otherCommit.getHash());
+            if(otherCommit.getParent() == null) {
+                break;
+            }
             otherCommit = Commit.fromFile(otherCommit.getParent());
         }
         return split;
@@ -422,8 +433,11 @@ public class Repository {
         String headFileHash = headCommit.getFileHash(fileName);
         String otherFileHash = otherCommit.getFileHash(fileName);
         String splitFileHash = splitCommit.getFileHash(fileName);
+        String removedFile = splitCommit.getRemovedFiles().get(fileName);
 
-        if(splitFileHash == null && otherFileHash == null) {
+
+
+        if(splitFileHash == null && otherFileHash == null && removedFile == null) {
             return 5;
         }
         if(splitFileHash == null && headFileHash == null) {
@@ -432,7 +446,7 @@ public class Repository {
         if(headFileHash == null && otherFileHash == null) {
             return 7;
         }
-        if(otherFileHash == null && splitFileHash.equals(headFileHash)) {
+        if(otherFileHash == null && (removedFile.equals(headFileHash) || splitFileHash.equals(headFileHash))) {
             return 8;
         }
         if(headFileHash == null && splitFileHash.equals(otherFileHash)) {
