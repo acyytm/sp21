@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
  *  @author TODO
  */
 public class Main {
-    // TODO: command: reset, read book and fix it
+    // TODO: command: merge
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 

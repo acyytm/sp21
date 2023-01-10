@@ -71,6 +71,7 @@ public class Commit implements Serializable{
         generateLog();
     }
 
+
     /**
      * A constructor that init a repo and create first Commit with timestamp is 1970 and parent is null
      * @param message commit message
@@ -260,4 +261,15 @@ public class Commit implements Serializable{
         removedFiles.clear();
     }
     /* TODO: fill in the rest of this class. */
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void addParent(String branchName) {
+        this.parents.add(branchName);
+    }
+
+
+
 }

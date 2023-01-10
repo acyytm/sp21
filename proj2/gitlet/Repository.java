@@ -328,6 +328,132 @@ public class Repository {
     }
 
     /**
+     * Merge command.
+     *      * 1. modified in other but not head --> other, return 1
+     *      * 2. modified in head but not other --> head, return 2
+     *      * 3. modified in other and head --> in same way, DNM, return 3
+     *      *                               --> in diff way, conflict, return 4
+     *      * 4. not in split nor other but in head --> head, return 5
+     *      * 5. not in split nor head but in other --> other, return 6
+     *      * 6. not in head nor other but in split --> remove it, return 7
+     *      * 6. unmodified in head but not present in other --> remove it, return 8
+     *      * 7. unmodified in other but not present in head --> remain removed return 9
+     */
+    public static void merge(String branchName) {
+        read();
+
+        Commit otherCommit = branches.getCommit(branchName);
+        Commit headCommit = head.getCommit();
+        Commit split = findSplit(headCommit, otherCommit);
+
+        Set<String> fileSet = new HashSet<>();
+        fileSet.addAll(otherCommit.getMap().keySet());
+        fileSet.addAll(headCommit.getMap().keySet());
+        fileSet.addAll(split.getMap().keySet());
+
+        for (String fileName: fileSet) {
+            int property = judge(fileName, headCommit, otherCommit, split);
+            switch (property) {
+                case 1:
+                case 6:
+                    otherCommit.getFileHash(fileName);
+                    Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, fileName);
+                    blob.writeToFile(CWD);
+                    stage.add(fileName);
+                    break;
+                case 2:
+                case 3:
+                    break;
+                case 4:
+                    //conflict
+                    break;
+                case 5:
+                    break;
+                case 7:
+                    break;
+                case 8:
+                    rm(fileName);
+                case 9:
+                    break;
+            }
+        }
+
+        commit("Merged "  + branchName + " into " + head.getCurrentBranch() + ".");
+
+        save();
+    }
+
+    /**
+     * Help method, find split commit and return it
+     */
+    private  static Commit findSplit(Commit headCommit, Commit otherCommit) {
+        Set<String> set = new HashSet<>();
+        Commit split = null;
+
+        for(String hash = headCommit.getHash(); hash != null; hash = headCommit.getHash()) {
+            set.add(headCommit.getHash());
+            headCommit = Commit.fromFile(headCommit.getParent());
+        }
+
+        for(String hash = otherCommit.getHash(); hash != null; hash = otherCommit.getHash()) {
+            if (set.contains(hash)) {
+                split = Commit.fromFile(hash);
+                break;
+            }
+            set.add(otherCommit.getHash());
+            otherCommit = Commit.fromFile(otherCommit.getParent());
+        }
+        return split;
+    }
+
+    /**
+     * Help method, judge a file
+     * 1. modified in other but not head --> other, return 1
+     * 2. modified in head but not other --> head, return 2
+     * 3. modified in other and head --> in same way, DNM, return 3
+     *                               --> in diff way, conflict, return 4
+     * 4. not in split nor other but in head --> head, return 5
+     * 5. not in split nor head but in other --> other, return 6
+     * 6. not in head nor other but in split --> remove it, return 7
+     * 6. unmodified in head but not present in other --> remove it, return 8
+     * 7. unmodified in other but not present in head --> remain removed return 9
+     */
+    private static int judge(String fileName, Commit headCommit, Commit otherCommit, Commit splitCommit) {
+        String headFileHash = headCommit.getFileHash(fileName);
+        String otherFileHash = otherCommit.getFileHash(fileName);
+        String splitFileHash = splitCommit.getFileHash(fileName);
+
+        if(splitFileHash == null && otherFileHash == null) {
+            return 5;
+        }
+        if(splitFileHash == null && headFileHash == null) {
+            return 6;
+        }
+        if(headFileHash == null && otherFileHash == null) {
+            return 7;
+        }
+        if(otherFileHash == null && splitFileHash.equals(headFileHash)) {
+            return 8;
+        }
+        if(headFileHash == null && splitFileHash.equals(otherFileHash)) {
+            return 9;
+        }
+        if(splitFileHash == null && headFileHash.equals(otherFileHash)) {
+            return 3;
+        }
+        if(headFileHash.equals(splitFileHash) && !otherFileHash.equals(splitFileHash)) {
+            return 1;
+        }
+        if(otherFileHash.equals(splitFileHash) && !headFileHash.equals(splitFileHash)) {
+            return 2;
+        }
+        if(!otherFileHash.equals(headFileHash)) {
+            return 4;
+        }
+        return 3;
+    }
+
+    /**
      * Remove branch command
      */
     public static void removeBranch(String branchName) {
