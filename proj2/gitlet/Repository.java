@@ -410,13 +410,15 @@ public class Repository {
                     stage.add(fileName);
                     System.out.println("Encountered a merge conflict.");
                     break;
-                case 7:
                 case 8:
                     rm(fileName);
             }
         }
 
         commit("Merged "  + branchName + " into " + head.getCurrentBranch() + ".", false);
+        Commit mergeCommit = head.getCommit();
+        mergeCommit.addParent(otherCommit.getHash());
+        mergeCommit.saveCommit();
 
         save();
     }
@@ -458,13 +460,18 @@ public class Repository {
     private  static Commit findSplit(Commit headCommit, Commit otherCommit) {
         Set<String> set = new HashSet<>();
         Commit split = null;
+        set.add(headCommit.getHash());
+        ArrayList<String> parents = headCommit.getParents();
 
-        for(String hash = headCommit.getHash(); hash != null; hash = headCommit.getHash()) {
-            set.add(headCommit.getHash());
-            if(headCommit.getParent() == null) {
-                break;
+        for(String parent: parents) {
+            Commit commit = Commit.fromFile(parent);
+            for(String hash = commit.getHash(); hash != null; hash = commit.getHash()) {
+                set.add(commit.getHash());
+                if(commit.getParent() == null) {
+                    break;
+                }
+                commit = Commit.fromFile(commit.getParent());
             }
-            headCommit = Commit.fromFile(headCommit.getParent());
         }
 
         for(String hash = otherCommit.getHash(); hash != null; hash = otherCommit.getHash()) {

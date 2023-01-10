@@ -229,6 +229,8 @@ public class Commit implements Serializable{
         this.parents.add(branchName);
     }
 
-
+    public ArrayList<String> getParents() {
+        return parents;
+    }
 
 }
