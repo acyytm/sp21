@@ -223,7 +223,9 @@ public class Repository {
 
         if(commit.contain(fileName)) {
             exist = true;
-            removal.add(fileName);
+            Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, commit.getFileHash(fileName));
+            blob.writeToFile(Stage.REMOVAL_DIR);
+            removal.addToRemoval(fileName, commit.getFileHash(fileName));
 
             if(file.exists()) {
                 file.delete();
@@ -318,8 +320,8 @@ public class Repository {
         checkoutBranch("temp");
         head.pointToBranch(oldBranch);
         branches.removeBranch("temp");
-        stage.deleteFiles();
-        removal.deleteFiles();
+        stage.clearStage();
+        removal.clearStage();
         //=========
         branches.removeBranch(oldBranch);
         branches.addBranch(oldBranch);

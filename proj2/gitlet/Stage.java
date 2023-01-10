@@ -89,7 +89,7 @@ public class Stage implements Serializable {
     }
 
     /** Delete all stage files. */
-    public void deleteFiles() {
+    public void clearStage() {
         for(Map.Entry<String, String> entry: files.entrySet())
         {
             File file = Utils.join(STAGE_DIR, entry.getValue());
@@ -123,5 +123,9 @@ public class Stage implements Serializable {
 
     public String getFile(String fileName) {
         return files.get(fileName);
+    }
+
+    public void addToRemoval(String fileName, String fileHash) {
+        files.put(fileName, fileHash);
     }
 }

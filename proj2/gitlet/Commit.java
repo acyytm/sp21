@@ -168,7 +168,7 @@ public class Commit implements Serializable{
             Blob blob = Blob.fromFile(Stage.STAGE_DIR, entry.getValue());
             blob.saveBlob(COMMIT_BLOB_DIR);
         }
-        stage.deleteFiles();
+        stage.clearStage();
     }
 
     /**
@@ -183,7 +183,7 @@ public class Commit implements Serializable{
             Blob blob = Blob.fromFile(Stage.REMOVAL_DIR, entry.getValue());
             blob.saveBlob(COMMIT_BLOB_DIR);
         }
-        removal.deleteFiles();
+        removal.clearStage();
     }
 
     /**
