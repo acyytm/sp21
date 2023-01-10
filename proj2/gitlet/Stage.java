@@ -15,7 +15,13 @@ public class Stage implements Serializable {
     public static final File STAGE_DIR = Utils.join(Repository.GITLET_DIR, "staging");
 
     /** Removal Area dir. */
-    public static final File REMOVAL_DIR = Utils.join(Repository.GITLET_DIR, "removal");
+    public static final File REMOVAL_DIR = Utils.join(Repository.GITLET_DIR, "removing");
+
+    /** Stage info dir. */
+    public static final File STAGE = Utils.join(Repository.GITLET_DIR, "STAGE");
+
+    /** Removal infor dir. */
+    public static final File REMOVAL = Utils.join(Repository.GITLET_DIR, "REMOVAL");
 
     /** stage file. */
     private HashMap<String, String> files;
@@ -61,13 +67,11 @@ public class Stage implements Serializable {
         }
     }
 
-    public void saveStage() {
-        File file = Utils.join(Repository.GITLET_DIR, "STAGE");
+    public void saveStage(File file) {
         Utils.writeObject(file, this);
     }
 
-    public static Stage fromFile() {
-        File file = Utils.join(Repository.GITLET_DIR, "STAGE");
+    public static Stage fromFile(File file) {
         Stage stage = Utils.readObject(file, Stage.class);
         return stage;
     }

@@ -544,11 +544,13 @@ public class Repository {
     /** Read necessary instance from file. */
     public static void read() {
         if(stage == null)
-            stage = Stage.fromFile();
+            stage = Stage.fromFile(Stage.STAGE);
         if(head == null)
             head = Head.fromFile();
         if(branches == null)
             branches = Branches.fromFile();
+        if(removal == null)
+            removal = Stage.fromFile(Stage.REMOVAL);
     }
 
     /** Get head pointer, you should invoke this after read.*/
@@ -571,10 +573,10 @@ public class Repository {
     }
 
     public static void save() {
-        stage.saveStage();
+        stage.saveStage(Stage.STAGE);
         head.saveHead();
         branches.saveBranches();
-        removal.saveStage();
+        removal.saveStage(Stage.REMOVAL);
     }
 
     /**
