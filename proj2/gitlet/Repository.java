@@ -499,13 +499,13 @@ public class Repository {
         if(splitFileHash == null && headFileHash.equals(otherFileHash)) {
             return 3;
         }
-        if(headFileHash.equals(splitFileHash) && !otherFileHash.equals(splitFileHash)) {
+        if(headFileHash != null && headFileHash.equals(splitFileHash) && !otherFileHash.equals(splitFileHash)) {
             return 1;
         }
-        if(otherFileHash.equals(splitFileHash) && !headFileHash.equals(splitFileHash)) {
+        if(otherFileHash != null && otherFileHash.equals(splitFileHash) && !headFileHash.equals(splitFileHash)) {
             return 2;
         }
-        if(!otherFileHash.equals(headFileHash)) {
+        if((otherFileHash == null) || !otherFileHash.equals(headFileHash)) {
             return 4;
         }
         return 3;
