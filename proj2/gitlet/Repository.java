@@ -362,7 +362,6 @@ public class Repository {
 
         Commit split = findSplit(headCommit, otherCommit);
 
-
         if(branchName.equals(head.getCurrentBranch())) {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
@@ -403,9 +402,6 @@ public class Repository {
                     blob.writeToFile(CWD);
                     stage.add(fileName);
                     break;
-                case 2:
-                case 3:
-                    break;
                 case 4:
                     //conflict
                     String targetContent = getConflict(fileName, headCommit, otherCommit);
@@ -414,14 +410,9 @@ public class Repository {
                     stage.add(fileName);
                     System.out.println("Encountered a merge conflict.");
                     break;
-                case 5:
-                    break;
                 case 7:
-                    break;
                 case 8:
                     rm(fileName);
-                case 9:
-                    break;
             }
         }
 
@@ -489,20 +480,17 @@ public class Repository {
         String headFileHash = headCommit.getFileHash(fileName);
         String otherFileHash = otherCommit.getFileHash(fileName);
         String splitFileHash = splitCommit.getFileHash(fileName);
-        String removedFile = removal.getFile(fileName);
 
-
-
-        if(splitFileHash == null && otherFileHash == null && removedFile == null) {
+        if(splitFileHash == null && otherFileHash == null && headFileHash != null) {
             return 5;
         }
-        if(splitFileHash == null && headFileHash == null) {
+        if(splitFileHash == null && headFileHash == null && otherFileHash != null) {
             return 6;
         }
-        if(headFileHash == null && otherFileHash == null) {
+        if(headFileHash == null && otherFileHash == null && splitFileHash != null) {
             return 7;
         }
-        if(otherFileHash == null && (removedFile.equals(headFileHash) || splitFileHash.equals(headFileHash))) {
+        if(otherFileHash == null && splitFileHash.equals(headFileHash)) {
             return 8;
         }
         if(headFileHash == null && splitFileHash.equals(otherFileHash)) {

@@ -14,6 +14,10 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
+        if(args.length == 0) {
+            System.out.println("Please enter a command.");
+            return;
+        }
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
@@ -80,6 +84,10 @@ public class Main {
     public static void validateNumArgs(String cmd, String [] args, int num) {
         if(cmd.equals("commit") && args.length == 1) {
             System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+        if(!cmd.equals("init") && !Repository.GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
         if(num != args.length) {
