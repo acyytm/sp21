@@ -26,7 +26,7 @@ public class Main {
                 break;
             // TODO: FILL THE REST IN
             case "commit":
-                validateMessage(args);
+                validateNumArgs("commit", args, 2);
                 Repository.commit(args[1]);
                 break;
             case "checkout":
@@ -78,16 +78,12 @@ public class Main {
     }
 
     public static void validateNumArgs(String cmd, String [] args, int num) {
-        if(num != args.length) {
-            System.out.println("Incorrect operands.");
+        if(cmd.equals("commit") && args.length == 1) {
+            System.out.println("Please enter a commit message.");
             System.exit(0);
         }
-    }
-
-    public static void validateMessage(String[] args) {
-        validateNumArgs("commit", args, 2);
-        if(args[1].isEmpty()) {
-            System.out.println("Please enter a commit message.");
+        if(num != args.length) {
+            System.out.println("Incorrect operands.");
             System.exit(0);
         }
     }

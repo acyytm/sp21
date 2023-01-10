@@ -128,4 +128,8 @@ public class Stage implements Serializable {
     public void addToRemoval(String fileName, String fileHash) {
         files.put(fileName, fileHash);
     }
+
+    public void deleteFile(String fileName) {
+        files.remove(fileName);
+    }
 }

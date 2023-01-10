@@ -88,6 +88,9 @@ public class Repository {
         if(removal.contain(fileName)) {
             Blob blob = Blob.fromFile(Stage.REMOVAL_DIR, removal.getFile(fileName));
             blob.writeToFile(CWD);
+            removal.deleteFile(fileName);
+            save();
+            return;
         }
         stage.add(fileName);
 
@@ -96,6 +99,10 @@ public class Repository {
 
     /** commit command. */
     public static void commit(String message) {
+        if(message.equals("")) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
         read();
         commit(message, true);
         save();
@@ -224,7 +231,7 @@ public class Repository {
         if(commit.contain(fileName)) {
             exist = true;
             Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, commit.getFileHash(fileName));
-            blob.writeToFile(Stage.REMOVAL_DIR);
+            blob.saveBlob(Stage.REMOVAL_DIR);
             removal.addToRemoval(fileName, commit.getFileHash(fileName));
 
             if(file.exists()) {
