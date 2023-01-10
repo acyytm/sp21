@@ -422,10 +422,27 @@ public class Repository {
     }
 
     private static String getConflict(String fileName, Commit curr, Commit other) {
-        Blob currBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, curr.getMap().get(fileName));
-        Blob otherBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, other.getMap().get(fileName));
-        String currContent = currBlob.getFileContent();
-        String otherContent = otherBlob.getFileContent();
+        String currFileHash = curr.getMap().get(fileName);
+        String otherFileHash = other.getMap().get(fileName);
+
+        String currContent = "";
+        String otherContent = "";
+
+        if(currFileHash == null) {
+            currContent = "";
+            Blob otherBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, other.getMap().get(fileName));
+            otherContent = otherBlob.getFileContent();
+        }else if(otherFileHash == null){
+            otherContent = "";
+            Blob currBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, curr.getMap().get(fileName));
+            currContent = currBlob.getFileContent();
+        }else {
+            Blob currBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, curr.getMap().get(fileName));
+            currContent = currBlob.getFileContent();
+            Blob otherBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, other.getMap().get(fileName));
+            otherContent = otherBlob.getFileContent();
+        }
+
         String content =
                 "<<<<<<< HEAD\n" +
                 currContent +
