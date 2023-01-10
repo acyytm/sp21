@@ -348,8 +348,31 @@ public class Repository {
 
         if(split.getHash().equals(headCommit.getHash())) {
             checkoutBranch(branchName);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
             return;
         }
+        if(branchName.equals(head.getCurrentBranch())) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+        if(!checkCWD(otherCommit)) {
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
+        }
+        if(otherCommit == null) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        if(split.getHash().equals(otherCommit.getHash())) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        if(!stage.empty() || !headCommit.getRemovedFiles().isEmpty()) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+
 
         Set<String> fileSet = new HashSet<>();
         fileSet.addAll(otherCommit.getMap().keySet());
@@ -371,6 +394,11 @@ public class Repository {
                     break;
                 case 4:
                     //conflict
+                    String targetContent = getConflict(fileName, headCommit, otherCommit);
+                    File file = Utils.join(CWD, fileName);
+                    Utils.writeContents(file, targetContent);
+                    stage.add(fileName);
+                    System.out.println("Encountered a merge conflict.");
                     break;
                 case 5:
                     break;
@@ -386,6 +414,20 @@ public class Repository {
         commit("Merged "  + branchName + " into " + head.getCurrentBranch() + ".");
 
         save();
+    }
+
+    private static String getConflict(String fileName, Commit curr, Commit other) {
+        Blob currBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, curr.getMap().get(fileName));
+        Blob otherBlob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, other.getMap().get(fileName));
+        String currContent = currBlob.getFileContent();
+        String otherContent = otherBlob.getFileContent();
+        String content =
+                "<<<<<<< HEAD\n" +
+                currContent +
+                "=======\n" +
+                otherContent +
+                ">>>>>>>\n";
+        return content;
     }
 
     /**

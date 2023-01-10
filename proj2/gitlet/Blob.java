@@ -73,4 +73,8 @@ public class Blob implements Serializable {
         return hash;
     }
 
+    public String getFileContent() {
+        return fileContent;
+    }
+
 }
