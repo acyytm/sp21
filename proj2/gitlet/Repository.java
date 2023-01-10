@@ -133,6 +133,14 @@ public class Repository {
     /** checkout id -- file command. */
     public static void checkout(String fileName, String hash) {
         read();
+
+        hash = getFullID(hash);
+
+        if(hash.equals("")) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+
         Commit commit = Commit.fromFile(hash);
         String fileHash = commit.getFileHash(fileName);
         if(fileHash == null) {
@@ -625,5 +633,17 @@ public class Repository {
             }
         }
         return true;
+    }
+
+    private static String getFullID(String shortID) {
+        List<String> files = Utils.plainFilenamesIn(Commit.COMMIT_DIR);
+        shortID = shortID.substring(0, 6);
+        for(String fileName: files) {
+            String shortName = fileName.substring(0, 6);
+            if(shortID.equals(shortName)) {
+                return fileName;
+            }
+        }
+        return "";
     }
 }
