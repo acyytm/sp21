@@ -48,8 +48,7 @@ public class Commit implements Serializable{
     /** Hash code of the commit. */
     private String hash;
 
-    /** keep removed files. */
-    private HashMap<String, String> removedFiles;
+
 
     /**
      * A constructor that takes message and its parent as arguments, timestamp will be initialized automatically.
@@ -64,6 +63,7 @@ public class Commit implements Serializable{
         Commit parentCommit = Commit.fromFile(parent);
         map.putAll(parentCommit.map);
         fromStage();
+        fromRemoval();
         hash = getCommitHash();
         // Head head = Repository.getHead();
         //head.pointTo(this);
@@ -91,7 +91,6 @@ public class Commit implements Serializable{
         this.timestamp = timestamp;
         parents = new ArrayList<>();
         this.map = new HashMap<>();
-        this.removedFiles = new HashMap<>();
     }
 
     /**
@@ -173,6 +172,21 @@ public class Commit implements Serializable{
     }
 
     /**
+     * help method, files in removal should be removed.
+     */
+    private void fromRemoval() {
+        Stage removal = Repository.getRemoval();
+        HashMap<String, String> stageMap = removal.getFiles();
+        for (HashMap.Entry<String, String> entry: stageMap.entrySet())
+        {
+            map.remove(entry.getKey(), entry.getValue());
+            Blob blob = Blob.fromFile(Stage.REMOVAL_DIR, entry.getValue());
+            blob.saveBlob(COMMIT_BLOB_DIR);
+        }
+        removal.deleteFiles();
+    }
+
+    /**
      * @return log information of a chain of commit.
      */
     public String getLogChain() {
@@ -186,46 +200,6 @@ public class Commit implements Serializable{
     /** Return if this file was contained. */
     public boolean contain(String fileName) {
         return map.containsKey(fileName);
-    }
-
-    /** Remove that file from map, and put it into removeFiles. */
-    public void remove(String fileName) {
-        removedFiles.put(fileName, map.get(fileName));
-        map.remove(fileName);
-    }
-
-    /** Display removed files. */
-    public void displayRemovedFiles() {
-        Set<String> set = removedFiles.keySet();
-        Object[] arr = set.toArray();
-        Arrays.sort(arr);
-
-        System.out.println("=== Removed Files ===");
-
-        for(Object key: arr)
-        {
-            System.out.println(key);
-        }
-        System.out.println();
-    }
-
-    /** Return whether the file exists in removedFiles. */
-    public boolean isRemoved(String fileName) {
-        return removedFiles.containsKey(fileName);
-    }
-
-    /** Readd a removed file. */
-    public void reAdd(String fileName) {
-        Blob blob = Blob.fromFile(Commit.COMMIT_BLOB_DIR, removedFiles.get(fileName));
-        blob.writeToFile(Repository.CWD);
-
-        map.put(fileName, removedFiles.get(fileName));
-        removedFiles.remove(fileName);
-    }
-
-    /** Return if removedFiles is empty. */
-    public boolean hasNoRemoved() {
-        return removedFiles.isEmpty();
     }
 
     /** Get the commit log. */
@@ -246,21 +220,6 @@ public class Commit implements Serializable{
     public HashMap<String, String> getMap() {
         return map;
     }
-
-    /**
-     * Return removal file map
-     */
-    public HashMap<String, String> getRemovedFiles() {
-        return removedFiles;
-    }
-
-    /**
-     * test method
-     */
-    public void clearRemoved() {
-        removedFiles.clear();
-    }
-    /* TODO: fill in the rest of this class. */
 
     public String getParent() {
         return parent;

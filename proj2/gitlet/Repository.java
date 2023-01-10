@@ -42,6 +42,10 @@ public class Repository {
     /** branches. */
     private static Branches branches;
 
+    /** Removal stage. */
+    private static Stage removal;
+
+
     /* TODO: fill in the rest of this class. */
 
     /** Init a repo. */
@@ -60,6 +64,7 @@ public class Repository {
         head = new Head(commit);
         stage = new Stage();
         branches = new Branches();
+        removal = new Stage();
         branches.addBranch("master");
 
         save();
@@ -80,14 +85,11 @@ public class Repository {
             System.exit(0);
         }
 
-        Commit commit = head.getCommit();
-        if(commit.isRemoved(fileName)) {
-            commit.reAdd(fileName);
-            commit.saveCommit();
+        if(removal.contain(fileName)) {
+            Blob blob = Blob.fromFile(Stage.REMOVAL_DIR, removal.getFile(fileName));
+            blob.writeToFile(CWD);
         }
-        else {
-            stage.add(fileName);
-        }
+        stage.add(fileName);
 
         save();
     }
@@ -95,9 +97,12 @@ public class Repository {
     /** commit command. */
     public static void commit(String message) {
         read();
+        commit(message, true);
+        save();
+    }
 
-        Commit headCommit = head.getCommit();
-        if(stage.empty() && headCommit.hasNoRemoved()) {
+    private static void commit(String message, boolean flag) {
+        if(stage.empty() && removal.empty() && flag) {
             System.out.println("No changes added to the commit.");
             save();
             System.exit(0);
@@ -109,8 +114,6 @@ public class Repository {
         head.pointTo(commit);
         String branch = head.getCurrentBranch();
         branches.update(branch, commit);
-
-        save();
     }
 
     /** checkout command. */
@@ -220,8 +223,7 @@ public class Repository {
 
         if(commit.contain(fileName)) {
             exist = true;
-            commit.remove(fileName);
-            commit.saveCommit();
+            removal.add(fileName);
 
             if(file.exists()) {
                 file.delete();
@@ -242,8 +244,10 @@ public class Repository {
         read();
 
         branches.display();
+        System.out.println("=== Staged Files ===");
         stage.display();
-        head.getCommit().displayRemovedFiles();
+        System.out.println("=== Removed Files ===");
+        removal.display();
 
         System.out.println("=== Modifications Not Staged For Commit ===\n");
         System.out.println("=== Untracked Files ===\n");
@@ -315,11 +319,8 @@ public class Repository {
         head.pointToBranch(oldBranch);
         branches.removeBranch("temp");
         stage.deleteFiles();
+        removal.deleteFiles();
         //=========
-        Commit headCommit = head.getCommit();
-        headCommit.clearRemoved();
-        headCommit.saveCommit();
-        head.pointTo(headCommit);
         branches.removeBranch(oldBranch);
         branches.addBranch(oldBranch);
         //=========
@@ -358,7 +359,7 @@ public class Repository {
             System.exit(0);
         }
 
-        if(!stage.empty() || !headCommit.getRemovedFiles().isEmpty()) {
+        if(!stage.empty() || !removal.empty()) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
@@ -415,7 +416,7 @@ public class Repository {
             }
         }
 
-        commit("Merged "  + branchName + " into " + head.getCurrentBranch() + ".");
+        commit("Merged "  + branchName + " into " + head.getCurrentBranch() + ".", false);
 
         save();
     }
@@ -479,7 +480,7 @@ public class Repository {
         String headFileHash = headCommit.getFileHash(fileName);
         String otherFileHash = otherCommit.getFileHash(fileName);
         String splitFileHash = splitCommit.getFileHash(fileName);
-        String removedFile = splitCommit.getRemovedFiles().get(fileName);
+        String removedFile = removal.getFile(fileName);
 
 
 
@@ -537,6 +538,7 @@ public class Repository {
         Commit.COMMIT_DIR.mkdir();
         Stage.STAGE_DIR.mkdir();
         Commit.COMMIT_BLOB_DIR.mkdir();
+        Stage.REMOVAL_DIR.mkdir();
     }
 
     /** Read necessary instance from file. */
@@ -561,10 +563,18 @@ public class Repository {
         return stage;
     }
 
+    /**
+     * Return removal
+     */
+    public static Stage getRemoval() {
+        return removal;
+    }
+
     public static void save() {
         stage.saveStage();
         head.saveHead();
         branches.saveBranches();
+        removal.saveStage();
     }
 
     /**
@@ -572,7 +582,6 @@ public class Repository {
      * @return true while everything has been committed, false while not
      */
     private static boolean checkCWD(Commit target) {
-        //Commit currentCommit = head.getCommit();
 
         List<String> filesCWD = Utils.plainFilenamesIn(CWD);
         HashMap<String, String> filesTargetCommitted = target.getMap();

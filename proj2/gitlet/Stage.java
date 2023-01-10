@@ -14,6 +14,9 @@ public class Stage implements Serializable {
     /** Staging Area directory. */
     public static final File STAGE_DIR = Utils.join(Repository.GITLET_DIR, "staging");
 
+    /** Removal Area dir. */
+    public static final File REMOVAL_DIR = Utils.join(Repository.GITLET_DIR, "removal");
+
     /** stage file. */
     private HashMap<String, String> files;
 
@@ -107,12 +110,14 @@ public class Stage implements Serializable {
         Object[] arr = set.toArray();
         Arrays.sort(arr);
 
-        System.out.println("=== Staged Files ===");
-
         for(Object key: arr)
         {
             System.out.println(key);
         }
         System.out.println();
+    }
+
+    public String getFile(String fileName) {
+        return files.get(fileName);
     }
 }
