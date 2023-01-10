@@ -29,7 +29,7 @@ public class Branches implements Serializable {
     public Commit getCommit(String name) {
         String hash = map.get(name);
         if(hash == null) {
-            System.out.println("Don't have this branch");
+            System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
         return Commit.fromFile(hash);

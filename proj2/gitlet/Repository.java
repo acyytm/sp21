@@ -344,35 +344,37 @@ public class Repository {
 
         Commit otherCommit = branches.getCommit(branchName);
         Commit headCommit = head.getCommit();
+
+        if(otherCommit == null) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+
         Commit split = findSplit(headCommit, otherCommit);
 
-        if(split.getHash().equals(headCommit.getHash())) {
-            checkoutBranch(branchName);
-            System.out.println("Current branch fast-forwarded.");
-            System.exit(0);
-            return;
-        }
-        if(branchName.equals(head.getCurrentBranch())) {
-            System.out.println("Cannot merge a branch with itself.");
+
+        if(!stage.empty() || !headCommit.getRemovedFiles().isEmpty()) {
+            System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
         if(!checkCWD(otherCommit)) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             System.exit(0);
         }
-        if(otherCommit == null) {
-            System.out.println("A branch with that name does not exist.");
+        if(branchName.equals(head.getCurrentBranch())) {
+            System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
         if(split.getHash().equals(otherCommit.getHash())) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
         }
-        if(!stage.empty() || !headCommit.getRemovedFiles().isEmpty()) {
-            System.out.println("You have uncommitted changes.");
+        if(split.getHash().equals(headCommit.getHash())) {
+            checkoutBranch(branchName);
+            System.out.println("Current branch fast-forwarded.");
             System.exit(0);
+            return;
         }
-
 
         Set<String> fileSet = new HashSet<>();
         fileSet.addAll(otherCommit.getMap().keySet());
