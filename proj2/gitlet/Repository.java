@@ -353,6 +353,11 @@ public class Repository {
         Commit split = findSplit(headCommit, otherCommit);
 
 
+        if(branchName.equals(head.getCurrentBranch())) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+
         if(!stage.empty() || !headCommit.getRemovedFiles().isEmpty()) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
@@ -361,10 +366,7 @@ public class Repository {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             System.exit(0);
         }
-        if(branchName.equals(head.getCurrentBranch())) {
-            System.out.println("Cannot merge a branch with itself.");
-            System.exit(0);
-        }
+
         if(split.getHash().equals(otherCommit.getHash())) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
