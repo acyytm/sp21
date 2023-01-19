@@ -20,7 +20,7 @@ public class World {
 
     private Node[][] nodes;
 
-    private TERenderer renderer;
+    //private TERenderer renderer;
 
     private final long SEED;
 
@@ -68,8 +68,8 @@ public class World {
      * Generate a world with every tile is nothing
      */
     public World(int seed) {
-        renderer = new TERenderer();
-        renderer.initialize(WIDTH, HEIGHT);
+        //renderer = new TERenderer();
+        //renderer.initialize(WIDTH, HEIGHT);
         world = new TETile[WIDTH][HEIGHT];
         nodes = new Node[WIDTH][HEIGHT];
         rooms = new ArrayList<>();
