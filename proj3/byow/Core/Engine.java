@@ -1,5 +1,6 @@
 package byow.Core;
 
+import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
@@ -45,8 +46,29 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
+        input = input.toUpperCase();
+        StringInputDevice inputSource = new StringInputDevice(input);
+        int seed = 0;
+        char key = 0;
+        if(inputSource.getNextKey() == 'N') {
+            while(inputSource.possibleNextInput()) {
+                key = inputSource.getNextKey();
+                if(key < '0' || key > '9') {
+                    break;
+                }
+                seed = seed * 10 + key - '0';
+            }
+        }
+        System.out.println(seed);
+        if(key != 'S') {
+            return null;
+        }
 
-        TETile[][] finalWorldFrame = null;
+
+        World world = new World(seed);
+
+        TETile[][] finalWorldFrame = world.getWorld();
+
         return finalWorldFrame;
     }
 }
